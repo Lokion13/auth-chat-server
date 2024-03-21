@@ -26,3 +26,14 @@ generate-user-api:
 	--go-grpc_out=pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
 	api/grpc/user_v1/user.proto
+
+build:
+	GOOS=linux GOARCH=amd64 go build -o service_linux cmd/main.go
+
+copy-to-server:
+	scp service_linux root@188.124.39.99:
+
+docker-build-and-push:
+	docker buildx build --no-cache --platform linux/amd64 -t cr.selcloud.ru/lokion13/auth-server-test:v0.0.1 .
+	docker login -u token -p CRgAAAAAS-ihJ9BvSFoVAudmw474uboH86481RNc cr.selcloud.ru/lokion13
+	docker push cr.selcloud.ru/lokion13/auth-server-test:v0.0.1
